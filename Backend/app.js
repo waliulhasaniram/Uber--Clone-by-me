@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000;
 const cors = require('cors');
 const connectDB = require('./db/db');
 const userRouter = require('./route/user.route');
+const cookieParser = require('cookie-parser');
 
 
 const corsOptions = {
@@ -18,6 +19,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
