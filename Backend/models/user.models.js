@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { parse } = require('dotenv');
 
 const userSchema = new mongoose.Schema({
     fullname: {
@@ -44,13 +45,15 @@ userSchema.methods.generateRefreshToken = async function (){
     {expiresIn: process.env.REFRESH_TOKEN_EXPIRY})
 }
 
+userSchema.pre('save', async function() {
+    if (!this.isModified('password')) return;
+    const salt = await bcrypt.genSalt(parseInt(process.env.saltRounds) || 12);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+
 userSchema.methods.comparePassword = async function(password) {
     return await bcrypt.compare(password, this.password);
-}
-
-userSchema.statics.hashPassword = async function(password) {
-    const salt = await bcrypt.genSalt(parseInt(process.env.saltRounds));
-    return await bcrypt.hash(password, salt);
 }
 
 const User = mongoose.model('User', userSchema);

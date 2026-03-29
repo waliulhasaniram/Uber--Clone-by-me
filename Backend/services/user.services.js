@@ -1,4 +1,5 @@
 const User = require('../models/user.models');
+const mongoose = require('mongoose');
 
 module.exports.createNewUser = async ({firstName, lastName, email, password}) => {
     if (!firstName || !email || !password) {
@@ -19,10 +20,10 @@ module.exports.createNewUser = async ({firstName, lastName, email, password}) =>
     return user;
 }
 
-module.exports.findUserByEmail = async (email) => {
-    return await User.findOne({email});
+module.exports.findUserByEmail = (email) => {
+    return User.findOne({email});
 };
 
-module.exports.findUserById = async (id) => {
-    return await User.findById(id);
+module.exports.findUserById = (id) => {
+    return User.findById(id);
 };
