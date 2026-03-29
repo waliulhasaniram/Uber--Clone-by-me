@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     fullname: {
@@ -24,21 +26,29 @@ const userSchema = new mongoose.Schema({
         required: true,
         select: false
     },
+    refreshToken: {
+        type: String
+    },
     socketId: {
         type: String
     }
 }, { timestamps: true });
 
-userSchema.methods.generateAuthToken = function() {
-    const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '10d' });
-    return token;
-};
+userSchema.methods.generateAccessToken = async function () {
+    return jwt.sign({_id: this._id.toString(), email: this.email}, process.env.ACCESS_TOKEN_SECRET, 
+    {expiresIn: process.env.ACCESS_TOKEN_EXPIRY})
+}
+
+userSchema.methods.generateRefreshToken = async function (){
+    return jwt.sign({_id: this._id.toString(), email: this.email}, process.env.REFRESH_TOKEN_SECRET, 
+    {expiresIn: process.env.REFRESH_TOKEN_EXPIRY})
+}
 
 userSchema.methods.comparePassword = async function(password) {
     return await bcrypt.compare(password, this.password);
 }
 
-userSchema.static.hashPassword = async function(password) {
+userSchema.statics.hashPassword = async function(password) {
     const salt = await bcrypt.genSalt(parseInt(process.env.saltRounds));
     return await bcrypt.hash(password, salt);
 }

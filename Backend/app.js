@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
 const cors = require('cors');
 const connectDB = require('./db/db');
+const userRouter = require('./route/user.route');
+
 
 const corsOptions = {
     origin: '*', // Replace with your frontend URL
@@ -17,8 +19,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/api', userRouter);
 
 app.get('/', (req, res) => {
   res.send('Ubar...!');
