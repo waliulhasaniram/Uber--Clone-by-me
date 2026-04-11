@@ -1,70 +1,95 @@
 const { createNewUser, findUserById, findUserByEmail } = require("../services/user.services");
-const userModel = require("../models/user.models");
-const { validationResult } = require('express-validator'); 
+const { validationResult } = require('express-validator');
+const ApiError = require("../utils/ApiError");
+const ApiResponse = require("../utils/ApiResponse");
+const asyncHandeler = require("../utils/asyncHandler");
 
-const generateAccessAndRefresToken = async(userID)=>{
+const generateAccessAndRefresToken = async (userID) => {
     try {
         const userToken = await findUserById(userID).exec()
+        if (!userToken) {
+            throw new ApiError(404, "User does not exist")
+        }
+
         const accessToken = await userToken.generateAccessToken()
         const refreshToken = await userToken.generateRefreshToken()
 
         userToken.refreshToken = refreshToken
-        await userToken.save({validateBeforeSave:false})
-        return {accessToken, refreshToken}
+        await userToken.save({ validateBeforeSave: false })
+        return { accessToken, refreshToken }
 
     } catch (error) {
-        throw new Error("can't generate access and refresh token")
+        throw new ApiError(500, error?.message || "Internal server error while generating tokens")
     }
 }
 
-const userRegister = async(req, res, next) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        const { firstName, lastName, email, password } = req.body;
-
-        const user = await createNewUser({ firstName, lastName, email, password });
-
-        res.status(201).json({ user });
-    } catch (error) {
-        next(error);
+const userRegister = asyncHandeler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        throw new ApiError(400, "Validation failed", errors.array());
     }
-}
+    const { firstName, lastName, email, password } = req.body;
 
-const userLogin = async(req, res, next) => {
-    try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        const { email, password } = req.body;
-        const user = await findUserByEmail(email).select('+password');
-        if (!user) {
-            throw new Error('Invalid credentials');
-        }
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            throw new Error('Invalid credentials');
-        }
-        const { accessToken, refreshToken } = await generateAccessAndRefresToken(user._id);
-        const loggedInUser = await findUserById(user._id).select("-password").exec(); 
+    const user = await createNewUser({ firstName, lastName, email, password });
 
-            const options = {
-                httpOnly : true,
-                secure: true
-            }
+    return res.status(201).json(
+        new ApiResponse(201, user, "User registered successfully")
+    );
+})
 
-            res.cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
-            .status(200).json({ statusCode: 200, data: { userExists: loggedInUser, accessToken, refreshToken }, message: "successfully logged in" });
-    } catch (error) {
-        next(error);
+const userLogin = asyncHandeler(async (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        throw new ApiError(400, "Validation failed", errors.array());
     }
-}
+    const { email, password } = req.body;
+    const user = await findUserByEmail(email).select('+password');
+    if (!user) {
+        throw new ApiError(401, 'Invalid credentials');
+    }
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+        throw new ApiError(401, 'Invalid credentials');
+    }
+    const { accessToken, refreshToken } = await generateAccessAndRefresToken(user._id);
+    const loggedInUser = await findUserById(user._id).select("-password").exec();
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .status(200).json(
+            new ApiResponse(200, { userExists: loggedInUser, accessToken, refreshToken }, "successfully logged in")
+        );
+})
+
+const userLogout = asyncHandeler(async (req, res, next) => {
+    const user = req.user;
+    await findUserById(user._id, {$unset: {refreshToken: 1 }}, {new: true}).exec();
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.clearCookie("accessToken", options).clearCookie("refreshToken", options).status(200).json(
+        new ApiResponse(200, null, "Successfully logged out")
+    );
+})
+
+const getUserProfile = asyncHandeler(async (req, res, next) => {
+    const user = req.user;
+    return res.status(200).json(
+        new ApiResponse(200, user, "User profile retrieved successfully")
+    );
+})
 
 module.exports = {
     userRegister,
-    userLogin
+    userLogin,
+    userLogout,
+    getUserProfile
 }
