@@ -27,3 +27,7 @@ module.exports.findUserByEmail = (email) => {
 module.exports.findUserById = (id) => {
     return User.findById(id);
 };
+
+module.exports.updateUserById = (id, updateData) => {
+    return User.findByIdAndUpdate(id, updateData, { new: true });
+};

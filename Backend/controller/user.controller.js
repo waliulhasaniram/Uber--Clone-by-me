@@ -1,4 +1,4 @@
-const { createNewUser, findUserById, findUserByEmail } = require("../services/user.services");
+const { createNewUser, findUserById, findUserByEmail, updateUserById } = require("../services/user.services");
 const { validationResult } = require('express-validator');
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
@@ -56,19 +56,23 @@ const userLogin = asyncHandeler(async (req, res, next) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'Lax'
     }
 
     return res.cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
         .status(200).json(
-            new ApiResponse(200, { userExists: loggedInUser, accessToken, refreshToken }, "successfully logged in")
+            new ApiResponse(200, { userExists: loggedInUser }, "successfully logged in")
         );
 })
 
 const userLogout = asyncHandeler(async (req, res, next) => {
     const user = req.user;
-    await findUserById(user._id, {$unset: {refreshToken: 1 }}, {new: true}).exec();
+    
+    // Ensure the refresh token is actually removed from the database
+    if (user?._id) {
+        await updateUserById(user._id, { $unset: { refreshToken: 1 } });
+    }
 
     const options = {
         httpOnly: true,
