@@ -61,6 +61,7 @@ const userLogin = asyncHandeler(async (req, res, next) => {
     }
 
     return res.cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
         .status(200).json(
             new ApiResponse(200, { userExists: loggedInUser }, "successfully logged in")
         );
@@ -76,7 +77,8 @@ const userLogout = asyncHandeler(async (req, res, next) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'Lax'
     }
 
     return res.clearCookie("accessToken", options).clearCookie("refreshToken", options).status(200).json(

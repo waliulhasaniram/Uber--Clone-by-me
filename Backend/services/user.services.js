@@ -1,13 +1,14 @@
 const User = require('../models/user.models');
 const mongoose = require('mongoose');
+const ApiError = require('../utils/ApiError');
 
 module.exports.createNewUser = async ({firstName, lastName, email, password}) => {
     if (!firstName || !email || !password) {
-        throw new Error('First name, email, and password are required');
+        throw new ApiError(400, 'First name, email, and password are required');
     }
     const existingUser = await User.findOne({email});
     if (existingUser) {
-        throw new Error('User already exists');
+        throw new ApiError(409, 'User with this email already exists');
     }
     const user = await User.create({
         fullname: {
