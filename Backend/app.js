@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000;
 const cors = require('cors');
 const connectDB = require('./db/db');
 const userRouter = require('./route/user.route');
+const captainRoute = require('./route/captain.route');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api', userRouter);
+app.use('/api/captain', captainRoute);
 
 app.get('/', (req, res) => {
   res.send('Ubar...!');

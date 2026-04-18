@@ -1,4 +1,4 @@
-const { createNewUser, findUserById, findUserByEmail, updateUserById } = require("../services/user.services");
+const { createNewUser, findUserById, findUserByEmail, updateUserById } = require("../services/user.service");
 const { validationResult } = require('express-validator');
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");

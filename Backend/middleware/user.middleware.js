@@ -1,4 +1,4 @@
-const { findUserById } = require("../services/user.services");
+const { findUserById } = require("../services/user.service");
 const asyncHandeler = require("../utils/asyncHandler");
 const jwt = require("jsonwebtoken");
 const ApiError = require("../utils/ApiError");

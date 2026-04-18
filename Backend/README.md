@@ -1,9 +1,9 @@
-# User Authentication API Documentation
+# Uber Clone API Documentation
 
-This documentation covers the user-related endpoints for the Uber Clone Backend. All responses follow a standardized format using the `ApiResponse` class.
+This documentation covers the user and captain endpoints for the Uber Clone Backend. All responses follow a standardized format using the `ApiResponse` class.
 
 ## Base URL
-The base URL for these routes depends on your server configuration (e.g., `http://localhost:4000/users`).
+The base URL for these routes depends on your server configuration (e.g., `http://localhost:4000/api`).
 
 ## Response Format
 
@@ -27,7 +27,7 @@ The base URL for these routes depends on your server configuration (e.g., `http:
 
 ---
 
-## Endpoints
+## User Endpoints
 
 ### 1. Register User
 Creates a new user account.
@@ -88,6 +88,44 @@ Retrieves the profile information of the currently logged-in user.
 - **Success Response Data:** Returns the authenticated user object (excluding the password).
 
 ---
+
+## Captain Endpoints
+
+### 1. Register Captain
+Creates a new captain (driver) account with vehicle details.
+
+- **URL:** `/captain/register`
+- **Method:** `POST`
+- **Authentication Required:** No
+- **Request Body:**
+  | Field | Type | Requirement | Description |
+  | :--- | :--- | :--- | :--- |
+  | `fullname.firstName` | String | Required | Min 3 characters |
+  | `fullname.lastName` | String | Optional | Min 3 characters |
+  | `email` | String | Required | Must be a valid email |
+  | `password` | String | Required | Min 6 characters |
+  | `vehicles.color` | String | Required | Vehicle color |
+  | `vehicles.plate` | String | Required | Vehicle plate number |
+  | `vehicles.capacity` | Number | Required | Min 1 (Integer) |
+  | `vehicles.vehicleType`| String | Required | Options: car, motorcycle, auto |
+
+- **Success Response Data:**
+  ```json
+  {
+    "captain": {
+      "_id": "id_string",
+      "fullname": { "firstName": "...", "lastName": "..." },
+      "email": "...",
+      "status": "inactive",
+      "vehicles": { ... },
+      "createdAt": "..."
+    },
+    "token": "jwt_token_string"
+  }
+  ```
+
+---
+
 
 ## Middleware: Authentication
 
