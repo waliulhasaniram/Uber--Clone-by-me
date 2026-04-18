@@ -30,3 +30,11 @@ module.exports.findCaptainByEmail = (email) => {
 module.exports.findCaptainById = (id) => {
     return captainModel.findById(id);
 };
+
+module.exports.updateCaptainById = (id, updateData) => {
+    return captainModel.findByIdAndUpdate(id, updateData, { new: true });
+};
+
+module.exports.deleteCaptainById = (id) => {
+    return captainModel.findByIdAndDelete(id);
+};

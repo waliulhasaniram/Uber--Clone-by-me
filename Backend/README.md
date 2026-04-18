@@ -126,6 +126,42 @@ Creates a new captain (driver) account with vehicle details.
 
 ---
 
+### 2. Login Captain
+Authenticates a captain and returns access/refresh tokens via cookies.
+
+- **URL:** `/captain/login`
+- **Method:** `POST`
+- **Authentication Required:** No
+- **Request Body:**
+  | Field | Type | Requirement | Description |
+  | :--- | :--- | :--- | :--- |
+  | `email` | String | Required | Valid captain email |
+  | `password` | String | Required | Captain password |
+
+- **Success Headers:** Sets `accessToken` and `refreshToken` as `HttpOnly` cookies.
+- **Success Response Data:** Returns the authenticated captain object (excluding the password).
+
+---
+
+### 3. Logout Captain
+Logs out the currently authenticated captain by clearing cookies and invalidating the session.
+
+- **URL:** `/captain/logout`
+- **Method:** `POST`
+- **Authentication Required:** Yes (Valid Captain Access Token)
+- **Success Action:** Clears `accessToken` and `refreshToken` cookies.
+
+---
+
+### 4. Get Captain Profile
+Retrieves the profile information of the currently logged-in captain.
+
+- **URL:** `/captain/profile`
+- **Method:** `GET`
+- **Authentication Required:** Yes (Valid Captain Access Token)
+- **Success Response Data:** Returns the authenticated captain object.
+
+---
 
 ## Middleware: Authentication
 

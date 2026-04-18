@@ -32,3 +32,7 @@ module.exports.findUserById = (id) => {
 module.exports.updateUserById = (id, updateData) => {
     return User.findByIdAndUpdate(id, updateData, { new: true });
 };
+
+module.exports.deleteUserById = (id) => {
+    return User.findByIdAndDelete(id);
+};

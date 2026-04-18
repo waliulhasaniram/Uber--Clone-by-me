@@ -64,7 +64,10 @@ const captainSchema = new mongoose.Schema({
         longitude: {
             type: Number,
         }
-    }
+    },
+    refreshToken: {
+        type: String
+    },
 }, { timestamps: true });
 
 captainSchema.pre('save', async function() {
@@ -80,6 +83,11 @@ captainSchema.methods.comparePassword = async function(password) {
 captainSchema.methods.generateAuthToken = async function() {
     return jwt.sign({_id: this._id.toString(), email: this.email}, process.env.CAPTAIN_AUTH_SECRET, 
     {expiresIn: process.env.CAPTAIN_AUTH_SECRET_EXPIRY});
+}
+
+captainSchema.methods.generateCaptainRefreshToken = async function (){
+    return jwt.sign({_id: this._id.toString(), email: this.email}, process.env.REFRESH_TOKEN_SECRET, 
+    {expiresIn: process.env.REFRESH_TOKEN_EXPIRY})
 }
 
 const captain = mongoose.model('Captain', captainSchema);

@@ -63,11 +63,11 @@ const userLogin = asyncHandeler(async (req, res, next) => {
     return res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .status(200).json(
-            new ApiResponse(200, { userExists: loggedInUser }, "successfully logged in")
+            new ApiResponse(200, loggedInUser, "successfully logged in")
         );
 })
 
-const userLogout = asyncHandeler(async (req, res, next) => {
+const userLogout = asyncHandeler(async (req, res) => {
     const user = req.user;
     
     // Ensure the refresh token is actually removed from the database
@@ -86,7 +86,7 @@ const userLogout = asyncHandeler(async (req, res, next) => {
     );
 })
 
-const getUserProfile = asyncHandeler(async (req, res, next) => {
+const getUserProfile = asyncHandeler(async (req, res) => {
     const user = req.user;
     return res.status(200).json(
         new ApiResponse(200, user, "User profile retrieved successfully")
