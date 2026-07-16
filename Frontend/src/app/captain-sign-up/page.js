@@ -1,6 +1,88 @@
+"use client";
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { registerCaptain } from '../actions/loginAndSignUpActions';
+
+const initialForm = {
+  fullname: {
+    firstName: '',
+    lastName: '',
+  },
+  email: '',
+  password: '',
+  vehicles: {
+    vehicleType: '',
+    color: '',
+    plate: '',
+    capacity: '',
+  },
+};
 
 export const CaptainSignUp = () => {
+  const router = useRouter();
+  const [form, setForm] = useState(initialForm);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === 'firstName' || name === 'lastName') {
+      setForm((prev) => ({
+        ...prev,
+        fullname: {
+          ...prev.fullname,
+          [name]: value,
+        },
+      }));
+      return;
+    }
+
+    if (name === 'vehicleType' || name === 'color' || name === 'plate' || name === 'capacity') {
+      setForm((prev) => ({
+        ...prev,
+        vehicles: {
+          ...prev.vehicles,
+          [name]: value,
+        },
+      }));
+      return;
+    }
+
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setMessage('');
+    setError('');
+
+    try {
+      const payload = {
+        fullname: form.fullname,
+        email: form.email,
+        password: form.password,
+        vehicles: {
+          ...form.vehicles,
+          capacity: Number(form.vehicles.capacity),
+        },
+      };
+
+      const response = await registerCaptain(payload);
+      setMessage(response?.message || 'Captain account created successfully.');
+      setForm(initialForm);
+      router.push('/captain-sign-in');
+    } catch (err) {
+      setError(err.message || 'Unable to create captain account.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col relative overflow-hidden">
 
@@ -21,13 +103,27 @@ export const CaptainSignUp = () => {
         <h1 className="text-2xl font-bold tracking-tight mb-1">Create Your Account As A Captain</h1>
         <p className="text-gray-500 text-sm mb-8">Sign up as a captain to start earning</p>
 
-        <form className="w-full max-w-md flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col gap-5">
+          {message ? (
+            <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+              {message}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              {error}
+            </p>
+          ) : null}
 
           {/* name row */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">First Name</label>
               <input
+                name="firstName"
+                value={form.fullname.firstName}
+                onChange={handleChange}
+                required
                 type="text"
                 placeholder="John"
                 className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -36,6 +132,9 @@ export const CaptainSignUp = () => {
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">Last Name</label>
               <input
+                name="lastName"
+                value={form.fullname.lastName}
+                onChange={handleChange}
                 type="text"
                 placeholder="Doe"
                 className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -47,6 +146,10 @@ export const CaptainSignUp = () => {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-400">Email</label>
             <input
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
               type="email"
               placeholder="john@example.com"
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -57,6 +160,11 @@ export const CaptainSignUp = () => {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-400">Password</label>
             <input
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              minLength="6"
               type="password"
               placeholder="••••••••"
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -74,7 +182,13 @@ export const CaptainSignUp = () => {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">Vehicle Type</label>
-              <select className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-gray-500 outline-none focus:border-[#E30613]/50 transition-colors duration-300 appearance-none cursor-pointer">
+              <select
+                name="vehicleType"
+                value={form.vehicles.vehicleType}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-gray-500 outline-none focus:border-[#E30613]/50 transition-colors duration-300 appearance-none cursor-pointer"
+              >
                 <option value="">Select type</option>
                 <option value="sedan">Sedan</option>
                 <option value="suv">SUV</option>
@@ -86,6 +200,10 @@ export const CaptainSignUp = () => {
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">Color</label>
               <input
+                name="color"
+                value={form.vehicles.color}
+                onChange={handleChange}
+                required
                 type="text"
                 placeholder="Black"
                 className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -98,6 +216,10 @@ export const CaptainSignUp = () => {
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">Plate Number</label>
               <input
+                name="plate"
+                value={form.vehicles.plate}
+                onChange={handleChange}
+                required
                 type="text"
                 placeholder="ABC-1234"
                 className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:border-[#E30613]/50 transition-colors duration-300"
@@ -105,7 +227,13 @@ export const CaptainSignUp = () => {
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400">Capacity</label>
-              <select className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-gray-500 outline-none focus:border-[#E30613]/50 transition-colors duration-300 appearance-none cursor-pointer">
+              <select
+                name="capacity"
+                value={form.vehicles.capacity}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-gray-500 outline-none focus:border-[#E30613]/50 transition-colors duration-300 appearance-none cursor-pointer"
+              >
                 <option value="">Select</option>
                 <option value="1">1 passenger</option>
                 <option value="2">2 passengers</option>
@@ -120,9 +248,10 @@ export const CaptainSignUp = () => {
           {/* submit */}
           <button
             type="submit"
-            className="w-full py-3.5 bg-[#E30613] hover:bg-[#b91c1c] text-white text-sm font-semibold tracking-wide uppercase rounded-xl transition-colors duration-300 cursor-pointer mt-2"
+            disabled={isLoading}
+            className="w-full py-3.5 bg-[#E30613] hover:bg-[#b91c1c] disabled:cursor-not-allowed disabled:opacity-70 text-white text-sm font-semibold tracking-wide uppercase rounded-xl transition-colors duration-300 cursor-pointer mt-2"
           >
-            Create Account
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
 
           {/* sign in link */}
