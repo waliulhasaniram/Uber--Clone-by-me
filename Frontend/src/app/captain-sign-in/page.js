@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { loginCaptain } from '../actions/loginAndSignUpActions';
+import { useCaptain } from '../context/captainContext';
 
 const initialForm = {
   email: '',
@@ -12,6 +13,7 @@ const initialForm = {
 
 export const CaptainSignIn = () => {
   const router = useRouter();
+  const { setCaptain } = useCaptain();
   const [form, setForm] = useState(initialForm);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -30,6 +32,7 @@ export const CaptainSignIn = () => {
 
     try {
       const response = await loginCaptain(form);
+      setCaptain(response?.data?.captain ?? response?.data?.loggedInCaptain ?? null);
       setMessage(response?.message || 'Signed in successfully.');
       setForm(initialForm);
       router.push('/');

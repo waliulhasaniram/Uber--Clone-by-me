@@ -87,7 +87,7 @@ const captainLogin = asyncHandeler(async (req, res) => {
     return res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .status(200).json(
-            new ApiResponse(200, loggedInCaptain, "successfully logged in")
+            new ApiResponse(200, { loggedInCaptain, accessToken, refreshToken }, "successfully logged in")
         );  
 });
 

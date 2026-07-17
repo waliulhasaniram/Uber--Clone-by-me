@@ -1,8 +1,19 @@
-import Link from 'next/link';
-export const Home = () => {
+"use client";
+import { useCaptainAuth } from "@/hooks/captainAuthentication";
+import { useAuth } from "@/hooks/userAuthentication";
+import Link from "next/link";
+
+export default function Home() {
+  const { userData, isLoading, handleLogout } = useAuth();
+  const { captain, isLoadingCaptain, handleCaptainLogout } = useCaptainAuth();
+
+  const userFirstName = userData?.fullname?.firstName || userData?.firstName || "there";
+  const captainFirstName = captain?.fullname?.firstName || captain?.firstName || "there";
+  const isAuthenticated = Boolean(userData || captain);
+  const isLoadingAuth = isLoading || isLoadingCaptain;
+
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col relative overflow-hidden">
-
       {/* Ambient glow */}
       <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#E30613] rounded-full blur-[180px] opacity-[0.07] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#4a90d9] rounded-full blur-[150px] opacity-[0.04] pointer-events-none" />
@@ -19,14 +30,42 @@ export const Home = () => {
           </div>
           <span className="text-xl font-bold tracking-tight">Waliul's Uber</span>
         </div>
-        <button className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer">
-          Sign In
-        </button>
+
+        <div className="flex items-center gap-3">
+          {isLoadingAuth ? (
+            <span className="text-sm text-gray-400">Loading...</span>
+          ) : userData ? (
+            <>
+              <span className="text-sm font-medium text-gray-300">Hello, {userFirstName}</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                Logout
+              </button>
+            </>
+          ) : captain ? (
+            <>
+              <span className="text-sm font-medium text-gray-300">Hello, captain {captainFirstName}</span>
+              <button
+                type="button"
+                onClick={handleCaptainLogout}
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link href="/user-sign-in" className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer">
+              Sign In
+            </Link>
+          )}
+        </div>
       </nav>
 
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pb-12">
-
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-[#E30613] animate-pulse" />
@@ -150,6 +189,4 @@ export const Home = () => {
       </footer>
     </div>
   );
-};
-
-export default Home;
+}
