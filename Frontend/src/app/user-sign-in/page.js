@@ -34,7 +34,7 @@ export const CaptainSignIn = () => {
       const response = await loginUser(form);
       setUserdata(response?.data?.loggedInUser ?? null);
       setMessage(response?.message || 'Signed in successfully.');
-      router.push('/');
+      router.push('/home-user');
     } catch (err) {
       setError(err.message || 'Unable to sign in.');
     } finally {

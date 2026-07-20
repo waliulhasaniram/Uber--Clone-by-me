@@ -1,68 +1,12 @@
-"use client";
-import { useCaptainAuth } from "@/hooks/captainAuthentication";
-import { useAuth } from "@/hooks/userAuthentication";
 import Link from "next/link";
 
 export default function Home() {
-  const { userData, isLoading, handleLogout } = useAuth();
-  const { captain, isLoadingCaptain, handleCaptainLogout } = useCaptainAuth();
-
-  const userFirstName = userData?.fullname?.firstName || userData?.firstName || "there";
-  const captainFirstName = captain?.fullname?.firstName || captain?.firstName || "there";
-  const isAuthenticated = Boolean(userData || captain);
-  const isLoadingAuth = isLoading || isLoadingCaptain;
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col relative overflow-hidden">
       {/* Ambient glow */}
-      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#E30613] rounded-full blur-[180px] opacity-[0.07] pointer-events-none" />
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#E30613] rounded-full blur-[180px] opacity-[0.3] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-[#4a90d9] rounded-full blur-[150px] opacity-[0.04] pointer-events-none" />
-
-      {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-[#E30613] rounded-lg flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17v2m14-2v2" />
-              <circle cx="7.5" cy="17" r="1.5" fill="white" stroke="none" />
-              <circle cx="16.5" cy="17" r="1.5" fill="white" stroke="none" />
-            </svg>
-          </div>
-          <span className="text-xl font-bold tracking-tight">Waliul's Uber</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {isLoadingAuth ? (
-            <span className="text-sm text-gray-400">Loading...</span>
-          ) : userData ? (
-            <>
-              <span className="text-sm font-medium text-gray-300">Hello, {userFirstName}</span>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
-              >
-                Logout
-              </button>
-            </>
-          ) : captain ? (
-            <>
-              <span className="text-sm font-medium text-gray-300">Hello, captain {captainFirstName}</span>
-              <button
-                type="button"
-                onClick={handleCaptainLogout}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link href="/user-sign-in" className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer">
-              Sign In
-            </Link>
-          )}
-        </div>
-      </nav>
 
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pb-12">
@@ -76,8 +20,8 @@ export default function Home() {
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-6">
           <span className="block">Go anywhere</span>
           <span className="block mt-2">
-            with
-            <span className="text-[#E30613] ml-3">Ryde</span>
+            with your
+            <span className="text-[#E30613] ml-3">Ride</span>
           </span>
         </h1>
 
@@ -175,18 +119,6 @@ export default function Home() {
           </span>
         </div>
       </main>
-
-      {/* Bottom bar */}
-      <footer className="relative z-10 px-6 md:px-12 py-5 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span className="text-[11px] text-gray-600">© 2025 Ryde Technologies Inc.</span>
-        <div className="flex items-center gap-5">
-          {["Privacy", "Terms", "Help"].map((link) => (
-            <button key={link} className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors duration-300 cursor-pointer">
-              {link}
-            </button>
-          ))}
-        </div>
-      </footer>
     </div>
   );
 }

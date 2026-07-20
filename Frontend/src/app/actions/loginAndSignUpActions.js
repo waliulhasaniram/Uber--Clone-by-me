@@ -181,8 +181,9 @@ export async function getCaptainProfile() {
 
   if (!res.ok) {
     throw new Error(payload?.message || "Failed to get captain profile");
+  } else { 
+    return payload; 
   }
-  return payload;
 }
 
 export async function logoutCaptain() {

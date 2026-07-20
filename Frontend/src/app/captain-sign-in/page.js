@@ -35,7 +35,7 @@ export const CaptainSignIn = () => {
       setCaptain(response?.data?.captain ?? response?.data?.loggedInCaptain ?? null);
       setMessage(response?.message || 'Signed in successfully.');
       setForm(initialForm);
-      router.push('/');
+      router.push('/home-captain');
     } catch (err) {
       setError(err.message || 'Unable to sign in.');
     } finally {

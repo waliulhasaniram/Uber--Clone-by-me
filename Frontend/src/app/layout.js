@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "./context/userContext";
 import { CaptainProvider } from "./context/captainContext";
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/footer/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +21,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  
   return (
     <html
       lang="en"
@@ -27,7 +30,9 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <UserProvider>
           <CaptainProvider>
+            <Navbar />
             {children}
+            <Footer />
           </CaptainProvider>
         </UserProvider>
       </body>
